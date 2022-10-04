@@ -13,3 +13,8 @@ $(EXE_HERM) : $(CPP_HERM)
 
 $(EXE_GONO) : $(CPP_GONO)
 	$(CXX) $(CXXFLAGS) -o $(EXE_GONO) $(CPP_GONO)
+
+
+clean :
+	rm -rf $(EXE_HERM)
+	rm -rf $(EXE_GONO)

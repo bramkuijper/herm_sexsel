@@ -27,8 +27,6 @@ std::uniform_real_distribution<> uniform(0.0,1.0);
 // for meiotic segregation
 std::bernoulli_distribution random_allele(0.5);
 
-using namespace std;
-
 const int N = 5000; // population size
 const int N_mate_sample = 10; // number of mates sampled
 const int Ncourt_sample = 10; // number of offspring produced
@@ -44,9 +42,8 @@ double bm = 0.5; // cost of preference
 double cm = 0.5; // cost of trait
 double r = 0.5; // fecundity scalar
 double biast = 0.5; // mutation bias (0.5 implies no bias)
-double phi = 0.5; // mutation bias (0.5 implies no bias)
-double muf = 0.5; // mutation bias (0.5 implies no bias)
-double sduf = 0.5; // mutation bias (0.5 implies no bias)
+double muf = 0.5; // 
+double sduf = 0.5; // 
 double mu_p 	  = 0.05;            // mutation rate preference
 double mu_t 	  = 0.05;            // mutation rate ornament
 double mu_q 	  = 0.05;            // mutation rate ornament
@@ -57,12 +54,13 @@ const double NumGen = 50000; // number of generations
 const int skip = 10; // n generations interval before data is printed
 double meanornsurv = 0;
 
+std::string file_name = "output.csv";
+
 int popsize = N; // population size between 
 bool do_stats = 0;
 
 int generation = 0;
 int Nfemales = N / 2, Nmales = N / 2;
-unsigned seed = 0;
 int msurvivors = 0;
 int fsurvivors = 0;
 
@@ -94,40 +92,30 @@ typedef Individual Population[N];
 Population Females, Males, FemaleSurvivors, MaleSurvivors;
 int Parents[N*100][2]; 
 
-// filenames for data output
-string filename("sim_mutual_direct");
-string filename_new(create_filename(filename));
-ofstream DataFile(filename_new.c_str());  // output file 
-
-// filename in case we want to print the complete distribution
-#ifdef DISTRIBUTION
-string filename_new2(create_filename("sim_mutual_direct"));
-ofstream distfile(filename_new2.c_str());
-#endif //DISTRIBUTION
-
 
 // function which obtains arguments from the command line
 // for parameter definitions see top  of the file
 void initArguments(int argc, char *argv[])
 {
-	a = atof(argv[1]);
-	d = atof(argv[2]);
-	bm = atof(argv[3]);
-	bf = atof(argv[4]);
-	cm = atof(argv[5]);
-	r = atof(argv[6]);
+	a = std::stod(argv[1]);
+	d = std::stod(argv[2]);
+	bm = std::stod(argv[3]);
+	bf = std::stod(argv[4]);
+	cm = std::stod(argv[5]);
+	r = std::stod(argv[6]);
 
-	biast = atof(argv[7]);
-	mu_p = atof(argv[8]);
-	mu_t = atof(argv[9]);
-	mu_q = atof(argv[10]);
-	sdmu_p = atof(argv[11]);
-	sdmu_t = atof(argv[12]);
-	sdmu_q = atof(argv[13]);
-	phi = atof(argv[14]);
-    muf = atof(argv[15]);
-    sduf = atof(argv[16]);
-}
+	biast = std::stod(argv[7]);
+	mu_p = std::stod(argv[8]);
+	mu_t = std::stod(argv[9]);
+	mu_q = std::stod(argv[10]);
+	sdmu_p = std::stod(argv[11]);
+	sdmu_t = std::stod(argv[12]);
+	sdmu_q = std::stod(argv[13]);
+    muf = std::stod(argv[14]);
+    sduf = std::stod(argv[15]);
+
+    file_name = argv[16];
+} // end initArguments()
 
 
 void mutate(double &G, double mu, double sdmu, double mubias=0.0)
@@ -158,42 +146,36 @@ void mutate(double &G, double mu, double sdmu, double mubias=0.0)
 //}
 
 // write the parameters at the top or end of the file
-void WriteParameters()
+void WriteParameters(std::ofstream &DataFile)
 {
-	DataFile << endl
-		<< endl
-		<< "type:;" << "gonochorist_fisherian" << ";" << endl
-		<< "popsize_init:;" << N << ";" << endl
-		<< "n_mate_sample:;" << N_mate_sample << ";"<< endl
-		<< "init_t:;" << init_t << ";"<< endl
-		<< "init_p:;" << init_p << ";"<< endl
-		<< "init_q:;" << init_q << ";"<< endl
-		<< "a:;" <<  a << ";"<< endl
-		<< "d:;" <<  d << ";"<< endl
-		<< "bm:;" <<  bm << ";"<< endl
-		<< "bf:;" <<  bf << ";"<< endl
-		<< "cm:;" <<  cm << ";"<< endl
-		<< "r:;" << r << ";"<< endl
-		<< "phi:;" <<  phi << ";"<< endl
-		<< "mu_p:;" <<  mu_p << ";"<< endl
-		<< "mu_t:;" <<  mu_t << ";"<< endl
-		<< "mu_q:;" <<  mu_q << ";"<< endl
-		<< "mu_std_p:;" <<  sdmu_p << ";"<< endl
-		<< "mu_std_t:;" <<  sdmu_t << ";"<< endl
-		<< "mu_std_q:;" <<  sdmu_q << ";"<< endl
-		<< "biast:;" <<  biast << ";"<< endl
-		<< "seed:;" << seed << ";"<< endl;
+	DataFile << std::endl
+		<< std::endl
+		<< "type:;" << "gonochorist_fisherian" << ";" << std::endl
+		<< "popsize_init:;" << N << ";" << std::endl
+		<< "n_mate_sample:;" << N_mate_sample << ";"<< std::endl
+		<< "init_t:;" << init_t << ";"<< std::endl
+		<< "init_p:;" << init_p << ";"<< std::endl
+		<< "init_q:;" << init_q << ";"<< std::endl
+		<< "a:;" <<  a << ";"<< std::endl
+		<< "d:;" <<  d << ";"<< std::endl
+		<< "bm:;" <<  bm << ";"<< std::endl
+		<< "bf:;" <<  bf << ";"<< std::endl
+		<< "cm:;" <<  cm << ";"<< std::endl
+		<< "r:;" << r << ";"<< std::endl
+		<< "mu_p:;" <<  mu_p << ";"<< std::endl
+		<< "mu_t:;" <<  mu_t << ";"<< std::endl
+		<< "mu_q:;" <<  mu_q << ";"<< std::endl
+		<< "mu_std_p:;" <<  sdmu_p << ";"<< std::endl
+		<< "mu_std_t:;" <<  sdmu_t << ";"<< std::endl
+		<< "mu_std_q:;" <<  sdmu_q << ";"<< std::endl
+		<< "biast:;" <<  biast << ";"<< std::endl
+		<< "seed:;" << seed << ";"<< std::endl;
 }
 
 // initialize all the phenotypes
 void Init()
 {
-    // initialize a unique seed for the
-    // random number generator
-    // see random.h
-	seed = get_nanoseconds();
-	SetSeed(seed);    
-
+    std::normal_distribution <double> fecundity_sampler(muf,sduf);
 	// initialize the whole populatin
 	for (int i = 0; i < Nfemales; ++i)
 	{
@@ -209,7 +191,7 @@ void Init()
         Females[i].t_expr = init_t;
         Females[i].p_expr = init_p;
         Females[i].q_expr = init_q;
-        Females[i].u_expr = Normal(muf, sduf);
+        Females[i].u_expr = fecundity_sampler(rng_r);
 			
 	}
 
@@ -236,26 +218,26 @@ void Create_Kid(int mother, int father, Individual &kid)
 	assert(father >= 0 && father < msurvivors);
 
     // inherit male ornament
-	kid.t[0] = FemaleSurvivors[mother].t[random_allele(rng_r)(2)];
+	kid.t[0] = FemaleSurvivors[mother].t[random_allele(rng_r)];
 	mutate(kid.t[0], mu_t, sdmu_t, -biast);
-	kid.t[1] = MaleSurvivors[father].t[random_allele(rng_r)(2)];
+	kid.t[1] = MaleSurvivors[father].t[random_allele(rng_r)];
 	mutate(kid.t[1], mu_t, sdmu_t, -biast);
 
     // inherit female preference
-	kid.p[0] = FemaleSurvivors[mother].p[random_allele(rng_r)(2)];
+	kid.p[0] = FemaleSurvivors[mother].p[random_allele(rng_r)];
 	mutate(kid.p[0], mu_p, sdmu_p);
-	kid.p[1] = MaleSurvivors[father].p[random_allele(rng_r)(2)];
+	kid.p[1] = MaleSurvivors[father].p[random_allele(rng_r)];
 	mutate(kid.p[1], mu_p, sdmu_p);
     
     // inherit male preference
-	kid.q[0] = FemaleSurvivors[mother].q[random_allele(rng_r)(2)];
+	kid.q[0] = FemaleSurvivors[mother].q[random_allele(rng_r)];
 	mutate(kid.q[0], mu_q, sdmu_q);
-	kid.q[1] = MaleSurvivors[father].q[random_allele(rng_r)(2)];
+	kid.q[1] = MaleSurvivors[father].q[random_allele(rng_r)];
 	mutate(kid.q[1], mu_q, sdmu_q);
 }
 
 // survival stage
-void Survive()
+void Survive(std::ofstream &DataFile)
 {
     // keep track of the 
     // number of female breeders
@@ -302,24 +284,25 @@ void Survive()
     // extinction?
     if (fsurvivors == 0 || msurvivors == 0)
     {
-        WriteParameters();
+        WriteParameters(DataFile);
 
         exit(1);
     }
 
     // take the average of the surviving male trait value
     meanornsurv /= msurvivors;
-}
+} // end Survive()
 
 // female mate choice
 void Choose(Individual &mother, int &father) 
 {
     // sample from the cumulative distribution
-	double rand = Uniform()*mother.sumcourtship;
+	double rand = uniform(rng_r)*mother.sumcourtship;
+
+    std::uniform_int_distribution <int> father_sampler(0, msurvivors - 1);
 
     // by default mate randomly
-    // e.g., if the cumulative distribution is flat
-	father = RandomNumber(msurvivors);
+	father = father_sampler(rng_r);
 
     // probability that a male is chosen is proportional
     // to the size of his share in the cumulative distribution
@@ -353,10 +336,12 @@ void court_females(int const male_id)
     double courtship_score, choice_score;
     int current_female,courtnumber;
 
+    std::uniform_int_distribution <int> female_survivor_sampler(0, fsurvivors - 1);
+
     for (int i = 0; i < n_court_sample; ++i)
     {
         // get random female to court
-        current_female = RandomNumber(fsurvivors);
+        current_female = female_survivor_sampler(rng_r);
 
         FemalesToCourt[i] = current_female;
 
@@ -379,8 +364,6 @@ void court_females(int const male_id)
         // calculate the total score to females by multiplying by the female preference function
         FemaleSurvivors[current_female].male_courtship[courtnumber] = courtship_score * choice_score;
     }
-
-    cumuldist = pow(cumuldist, phi);
 
     assert(cumuldist > 0);
 
@@ -408,7 +391,8 @@ void court_females(int const male_id)
 void NextGen()
 {
     int offspring = 0;
-    size_t clutch_size;
+    int clutch_size_i;
+    double clutch_size_d;
 
     // males court a subset of females
     // females choose from this subset
@@ -427,18 +411,20 @@ void NextGen()
 
 		assert(Father >= 0 && Father < msurvivors);
 
-        clutch_size = floor(exp(r * FemaleSurvivors[i].u_expr));
+        clutch_size_d = exp(r * FemaleSurvivors[i].u_expr);
+
+        clutch_size_i = floor(clutch_size_d);
         
         // round off clutch size
-        if (Uniform() < exp(r * FemaleSurvivors[i].u_expr) - clutch_size)
+        if (uniform(rng_r) < clutch_size_d - clutch_size_i)
         {
-            ++clutch_size;
+            ++clutch_size_i;
         }
 
         // for each offspring to be produced
         // store the indices of the parents
         // we then make offspring later
-        for (size_t j = 0; j < clutch_size; ++j)
+        for (int  j = 0; j < clutch_size_i; ++j)
         {
             Parents[offspring][0] = i;
             Parents[offspring][1] = Father;
@@ -448,6 +434,9 @@ void NextGen()
 
     int sons = 0;
     int daughters = 0;
+
+    std::uniform_int_distribution <int> offspring_sampler(0, offspring - 1);
+    std::normal_distribution <double> fecundity_sampler(muf, sduf);
 
     // the size of the resulting population in the next 
     // generation is dependent on the number of 
@@ -460,16 +449,16 @@ void NextGen()
         // create an offspring
         Individual Kid;
 
-        int randparent = RandomNumber(offspring);
+        int random_offspring = offspring_sampler(rng_r);
 
         // randomly sample an offspring to replace the population
-        Create_Kid(Parents[randparent][0], Parents[randparent][1], Kid);
+        Create_Kid(Parents[random_offspring][0], Parents[random_offspring][1], Kid);
 
-        assert(Parents[randparent][0] >= 0 && Parents[randparent][0] < fsurvivors);
-        assert(Parents[randparent][1] >= 0 && Parents[randparent][1] < msurvivors);
+        assert(Parents[random_offspring][0] >= 0 && Parents[random_offspring][0] < fsurvivors);
+        assert(Parents[random_offspring][1] >= 0 && Parents[random_offspring][1] < msurvivors);
 
         // it's a boy
-        if (Uniform() < 0.5)
+        if (uniform(rng_r) < 0.5)
         {
             Males[sons] = Kid;
     
@@ -492,7 +481,7 @@ void NextGen()
             Females[daughters].p_expr = p;
             Females[daughters].q_expr = q;
             Females[daughters].t_expr = t;
-            Females[daughters].u_expr = Normal(muf, sduf);
+            Females[daughters].u_expr = fecundity_sampler(rng_r);
             ++daughters;
         }
     }
@@ -504,7 +493,7 @@ void NextGen()
 
 
 // write the data
-void WriteData()
+void WriteData(std::ofstream &DataFile)
 {
     double meanp = 0; 
     double meant = 0;
@@ -546,11 +535,11 @@ void WriteData()
     double varq = ssq/(Nmales+Nfemales) - meanq*meanq;
     double covpt = spt/(Nmales+Nfemales) - meant*meanp;
 
-    DataFile << generation << ";" << meanp << ";" << meant << ";" << varp << ";" << vart << ";" << covpt << ";" << meanq << ";" << varq << ";" << endl;
-}
+    DataFile << generation << ";" << meanp << ";" << meant << ";" << varp << ";" << vart << ";" << covpt << ";" << meanq << ";" << varq << ";" << std::endl;
+} // end WriteData()
 
 // headers of the datafile
-void WriteDataHeaders()
+void WriteDataHeaders(std::ofstream &DataFile)
 {
 	DataFile << "generation" 
 		<< ";mean_p" 
@@ -560,29 +549,33 @@ void WriteDataHeaders()
         << ";cov_pt" 
         << ";mean_q"
         << ";var_q;"
-        << endl;
-}
-
+        << std::endl;
+} // end WriteDataHeaders
+ 
 // the core part of the code
 int main(int argc, char ** argv)
 {
 	initArguments(argc, argv);
-	WriteDataHeaders();
+
+    std::ofstream output_file(file_name.c_str());
+
+	WriteDataHeaders(output_file);
+
 	Init();
 
 	for (generation = 0; generation <= NumGen; ++generation)
 	{
 		do_stats = generation % skip == 0;
 
-		Survive();
+		Survive(output_file);
         
         NextGen();
         
         if (do_stats)
 		{
-			WriteData();
+			WriteData(output_file);
 		}
 	}
 
-	WriteParameters();
+	WriteParameters(output_file);
 }
