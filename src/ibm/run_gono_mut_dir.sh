@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 
-./gonochorist_mutual_direct_benefits.exe 0.3 1.75   0.001 0.2 0.001 1.0      0    0.01 0.01 0.01 0.05 0.05 0.05   1.0    1.0 output_gono2.csv
+#./gonochorist_mutual_direct_benefits.exe 0.3 1.75   0.001 0.2 0.001 1.0      0    0.01 0.01 0.01 0.05 0.05 0.05   1.0    1.0 output_gono2.csv
 
+./gonochorist_mutual_direct_benefits.exe 0.3 0.0 0.001 0.2 0.001 0.0 0.0 0.01 0.01 0.01 0.05 0.05 0.05 1.0 1.0 sim_gono_04_10_2022_103414_0
 
 #	a = atof(argv[1]);
 #	d = atof(argv[2]);
@@ -17,6 +18,5 @@
 #	sdmu_p = atof(argv[11]);
 #	sdmu_t = atof(argv[12]);
 #	sdmu_q = atof(argv[13]);
-#	phi = atof(argv[14]);
 #    muf = atof(argv[15]);
 #    sduf = atof(argv[16]);

@@ -284,6 +284,7 @@ void Survive(std::ofstream &DataFile)
     // extinction?
     if (fsurvivors == 0 || msurvivors == 0)
     {
+        std::cout << "extinct" << std::endl;
         WriteParameters(DataFile);
 
         exit(1);
